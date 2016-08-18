@@ -1,0 +1,1 @@
+angular.module("ui.bootstrap", ["ui.bootstrap.typeahead", "ui.bootstrap.debounce", "ui.bootstrap.position"]);
