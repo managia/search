@@ -317,13 +317,14 @@ SHORTDAY:"Sun Mon Tue Wed Thu Fri Sat".split(" "),SHORTMONTH:"Jan Feb Mar Apr Ma
 PATTERNS:[{gSize:3,lgSize:3,maxFrac:3,minFrac:0,minInt:1,negPre:"-",negSuf:"",posPre:"",posSuf:""},{gSize:3,lgSize:3,maxFrac:2,minFrac:2,minInt:1,negPre:"-\u00a4",negSuf:"",posPre:"\u00a4",posSuf:""}]},id:"en-us",localeID:"en_US",pluralCat:function(a,c){var e=a|0,f=c;void 0===f&&(f=Math.min(b(a),3));Math.pow(10,f);return 1==e&&0==f?"one":"other"}})}]),F(C.document).ready(function(){fe(C.document,Bc)}))})(window);!window.angular.$$csp().noInlineStyle&&window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
 //# sourceMappingURL=angular.min.js.map
 
-(function (c) {
+(function (c, d) {
     var app = angular.module('main', []);
     app.controller('SearchController', ['$scope', '$http', '$timeout', function ($scope, $http, $timeout) {
             $scope.url = 'search';
-            $scope.keywords = '';
+            $scope.keywords = d.forms['searchForm']['keywords'].value;
+            $scope.categories = d.forms['searchForm']['categories'].value;
             var searchHandler;
-            $scope.$watch('keywords', function (val) {
+            $scope.$watchGroup(['keywords', 'categories'], function (val) {
                 if (searchHandler)
                 {
                     $timeout.cancel(searchHandler);
@@ -335,7 +336,10 @@ PATTERNS:[{gSize:3,lgSize:3,maxFrac:3,minFrac:0,minInt:1,negPre:"-",negSuf:"",po
             $scope.search = function () {
                 if ($scope.keywords.length >= c.minimum_length)
                 {
-                    $http.post($scope.url, {"data": $scope.keywords})
+                    $http.post($scope.url, {
+                        keywords: $scope.keywords,
+                        categories: $scope.categories
+                    })
                             .success(function (data, status) {
                                 $scope.status = status;
                                 $scope.data = data;
@@ -348,7 +352,7 @@ PATTERNS:[{gSize:3,lgSize:3,maxFrac:3,minFrac:0,minInt:1,negPre:"-",negSuf:"",po
                 }
             };
         }]);
-}(config));
+}(config, document));
 
 
 

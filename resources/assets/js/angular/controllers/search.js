@@ -1,10 +1,11 @@
-(function (c) {
+(function (c, d) {
     var app = angular.module('main', []);
     app.controller('SearchController', ['$scope', '$http', '$timeout', function ($scope, $http, $timeout) {
             $scope.url = 'search';
-            $scope.keywords = '';
+            $scope.keywords = d.forms['searchForm']['keywords'].value;
+            $scope.categories = d.forms['searchForm']['categories'].value;
             var searchHandler;
-            $scope.$watch('keywords', function (val) {
+            $scope.$watchGroup(['keywords', 'categories'], function (val) {
                 if (searchHandler)
                 {
                     $timeout.cancel(searchHandler);
@@ -16,7 +17,10 @@
             $scope.search = function () {
                 if ($scope.keywords.length >= c.minimum_length)
                 {
-                    $http.post($scope.url, {"data": $scope.keywords})
+                    $http.post($scope.url, {
+                        keywords: $scope.keywords,
+                        categories: $scope.categories
+                    })
                             .success(function (data, status) {
                                 $scope.status = status;
                                 $scope.data = data;
@@ -29,6 +33,6 @@
                 }
             };
         }]);
-}(config));
+}(config, document));
 
 

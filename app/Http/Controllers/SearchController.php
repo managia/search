@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Category;
 use App\Question;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class SearchController extends Controller
 {
@@ -12,29 +14,49 @@ class SearchController extends Controller
     {
         $suggests = [];
         $error = '';
-        $search = $request->get('data');
-        $params = $request->get('params');
-        if ($params) {
-            $suggests = Question::where('question', 'like', '%' . $params['keywords'] . '%')->take(10)->get();
-            /* @var $suggests \Illuminate\Database\Eloquent\Collection */
-            return response()->json(
-                            ['keywords' => $suggests->pluck('question')]
-            );
-        } elseif ($search) {
-            $suggests = Question::where('question', 'like', '%' . $search . '%')->take(10)->get();
+        $categories = $request->get('categories');
+        $keywords = $request->get('keywords');
+        if ($keywords) {
+            /* @var $query ClassName */
+            $query = (new Question())->query();
+            $query->where('question', 'like', '%' . $keywords . '%');
+            if (is_numeric($categories)) {
+                $query->where('category_id', $categories);
+            } elseif ($categories == 'none') {
+                $query->where(function ($query) {
+                    $query->whereNull('category_id');
+                    $query->orWhere('category_id', 0);
+                });
+            }
+            $suggests = $query->take(10)->get();
         } else {
             $error = 'Empty string';
         }
-        return response()->json(compact('suggests', 'error'));
+        return response()
+                        ->json(compact('suggests', 'error', 'categories'))
+                        ->withCookie(
+                                cookie('keywords', $keywords, 45000)
+                        )
+                        ->withCookie(
+                                cookie('categories', $categories, 45000)
+        );
     }
 
-    public function showSearch()
+    public function showSearch(Request $request)
     {
         $config = json_encode([
             'timeout' => env('QUESTION_TIMEOUT'),
             'minimum_length' => env('QUESTION_MINIMUM_LENGTH'),
         ]);
-        return view('welcome', compact('config'));
+        $keyword = $request->cookie('keywords', '');
+        $category = $request->cookie('categories', '');
+        $categories = [
+            'all' => 'Все категории',
+            'none' => 'Категория не присвоена'
+                ] + Category::all()->pluck('name', 'id')->toArray();
+        return view('welcome'
+                , compact('config', 'categories', 'keyword', 'category')
+        );
     }
 
 }
