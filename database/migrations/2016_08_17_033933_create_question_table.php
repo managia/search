@@ -15,8 +15,8 @@ class CreateQuestionTable extends Migration
     {
         Schema::create('question', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('question', 255);
-            $table->string('answer', 255);
+            $table->string('question', 1500);
+            $table->string('answer', 1500);
         });
         DB::statement('ALTER TABLE question ADD FULLTEXT full(question, answer)');
     }

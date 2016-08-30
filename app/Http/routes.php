@@ -10,7 +10,6 @@
   | and give it the controller to call when that URI is requested.
   |
  */
-
-Route::get('/', 'SearchController@showSearch');
+Route::auth();
+Route::get('/', 'HomeController@index');
 Route::post('/search', 'SearchController@search');
-

@@ -1,6 +1,8 @@
+/* global config */
+
 (function (c, d) {
-    var app = angular.module('main', []);
-    app.controller('SearchController', ['$scope', '$http', '$timeout', function ($scope, $http, $timeout) {
+    var app = angular.module('main', ['ngclipboard', 'ngFlash']);
+    app.controller('SearchController', ['$scope', '$http', '$timeout', 'Flash', function ($scope, $http, $timeout, Flash) {
             $scope.url = 'search';
             $scope.keywords = d.forms['searchForm']['keywords'].value;
             $scope.categories = d.forms['searchForm']['categories'].value;
@@ -32,6 +34,21 @@
                             });
                 }
             };
+            $scope.onClipboardSuccess = function (e) {
+                var text = $(e.trigger).find('.list-group-item-text');
+                text.addClass('bg-info');
+                setTimeout(function () {
+                    text.removeClass('bg-info');
+                }, 3000);
+                var message = '<strong>Copied to clipboard!</strong>';
+                var id = Flash.create('info', message, 3000, {}, true);
+            };
+            $(document).on('keydown', function (e) {
+                if (e.ctrlKey == false && e.shiftKey == true && e.altKey == false && e.keyCode == 67)
+                {
+                    $('[ng-controller="SearchController"] .list-group-item').first().trigger('click');
+                }
+            });
         }]);
 }(config, document));
 

@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Category;
 use App\Question;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class SearchController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
 
     public function search(Request $request)
     {
@@ -39,23 +42,6 @@ class SearchController extends Controller
                         )
                         ->withCookie(
                                 cookie('categories', $categories, 45000)
-        );
-    }
-
-    public function showSearch(Request $request)
-    {
-        $config = json_encode([
-            'timeout' => env('QUESTION_TIMEOUT'),
-            'minimum_length' => env('QUESTION_MINIMUM_LENGTH'),
-        ]);
-        $keyword = $request->cookie('keywords', '');
-        $category = $request->cookie('categories', '');
-        $categories = [
-            'all' => 'Все категории',
-            'none' => 'Категория не присвоена'
-                ] + Category::all()->pluck('name', 'id')->toArray();
-        return view('welcome'
-                , compact('config', 'categories', 'keyword', 'category')
         );
     }
 
