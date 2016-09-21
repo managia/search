@@ -14,7 +14,7 @@ class SearchController extends Controller
     }
 
     /**
-     * Search
+     * Search action
      * @param Request $request
      * @return string
      */
