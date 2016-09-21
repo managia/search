@@ -13,6 +13,11 @@ class SearchController extends Controller
         $this->middleware('auth');
     }
 
+    /**
+     * Search
+     * @param Request $request
+     * @return string
+     */
     public function search(Request $request)
     {
         $suggests = [];
