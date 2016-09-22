@@ -3,7 +3,7 @@ elixir(function (mix) {
     mix.sass('app.scss').scripts([
         '../../../bower_components/angular/angular.min.js',
         '../../../bower_components/angular-flash-alert/dist/angular-flash.min.js',
-        '../../../bower_components/clipboard/dist/clipboard.min.js',
+        '../../../bower_components/clipboard/dist/clipboard.js',
         'angular/modules/ngclipboard.js',
         'angular/controllers/search.js'
     ], 'public/js/app.js')

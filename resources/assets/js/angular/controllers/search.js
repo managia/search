@@ -2,7 +2,7 @@
 
 (function (c, d) {
     var app = angular.module('main', ['ngclipboard', 'ngFlash']);
-    app.controller('SearchController', ['$scope', '$http', '$timeout', 'Flash', function ($scope, $http, $timeout, Flash) {
+    app.controller('SearchController', ['$scope', '$http', '$timeout', 'Flash', '$sce', function ($scope, $http, $timeout, Flash, $sce) {
             $scope.url = 'search';
             $scope.keywords = d.forms['searchForm']['keywords'].value;
             $scope.categories = d.forms['searchForm']['categories'].value;
@@ -16,6 +16,9 @@
                     $scope.search();
                 }, c.timeout);
             });
+            function signMark(answer) {
+                return $sce.trustAsHtml(answer.replace(/(.*)[<](.*)[>](.*)/, '$1<mark data-clipboard-text="$2"><$2></mark>$3'));
+            }
             $scope.search = function () {
                 if ($scope.keywords.length >= c.minimum_length)
                 {
@@ -25,6 +28,16 @@
                     })
                             .success(function (data, status) {
                                 $scope.status = status;
+                                for (i in data.suggests) {
+                                    var marked = signMark(data.suggests[i].answer),
+                                            mark = $(marked).has('mark');
+                                    if (mark.length) {
+                                        data.suggests[i].mark = mark.text();
+                                    } else {
+                                        data.suggests[i].mark = '';
+                                    }
+                                    data.suggests[i].markedAnswer = marked;
+                                }
                                 $scope.data = data;
                                 $scope.result = data;
                             })
@@ -36,9 +49,17 @@
             };
             $scope.onClipboardSuccess = function (e) {
                 var text = $(e.trigger).find('.list-group-item-text');
-                text.addClass('bg-info');
+                if (text.has('mark')) {
+                    element = text.find('mark');
+                } else {
+                    element = text;
+                }
+                element.addClass('bg-info');
+                function rmClass(el) {
+                    el.removeClass('bg-info');
+                }
                 setTimeout(function () {
-                    text.removeClass('bg-info');
+                    rmClass(element);
                 }, 3000);
                 var message = '<strong>Copied to clipboard!</strong>';
                 var id = Flash.create('info', message, 3000, {}, true);

@@ -18,7 +18,7 @@
         Clipboard = window.Clipboard;
     }
 
-    angular.module(MODULE_NAME, []).directive('ngclipboard', function () {
+    angular.module(MODULE_NAME, []).directive('ngclipboard', function ($timeout) {
         return {
             restrict: 'A',
             scope: {
@@ -26,8 +26,29 @@
                 ngclipboardError: '&'
             },
             link: function (scope, element) {
+                $timeout(function () {
+                    var hasMark = element.has('mark');
+                    if (hasMark.length) {
+                        var mark = element.find('mark');
+                        var clipboardMark = new Clipboard(mark[0]);
+                        clipboardMark.on('success', function (e) {
+                            scope.$apply(function () {
+                                scope.ngclipboardSuccess({
+                                    e: e
+                                });
+                            });
+                            return false;
+                        });
+                        clipboardMark.on('error', function (e) {
+                            scope.$apply(function () {
+                                scope.ngclipboardError({
+                                    e: e
+                                });
+                            });
+                        });
+                    }
+                }, 0);
                 var clipboard = new Clipboard(element[0]);
-
                 clipboard.on('success', function (e) {
                     scope.$apply(function () {
                         scope.ngclipboardSuccess({
@@ -35,7 +56,6 @@
                         });
                     });
                 });
-
                 clipboard.on('error', function (e) {
                     scope.$apply(function () {
                         scope.ngclipboardError({
@@ -43,7 +63,6 @@
                         });
                     });
                 });
-
             }
         };
     });
