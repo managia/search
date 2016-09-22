@@ -1187,11 +1187,10 @@ module.exports = E;
                 }
             };
             $scope.onClipboardSuccess = function (e) {
-                var text = $(e.trigger).find('.list-group-item-text');
-                if (text.has('mark')) {
-                    element = text.find('mark');
+                if ($(e.trigger).is('mark')) {
+                    element = $(e.trigger);
                 } else {
-                    element = text;
+                    element = $(e.trigger).find('.list-group-item-text');
                 }
                 element.addClass('bg-info');
                 function rmClass(el) {
