@@ -17,6 +17,7 @@ class SearchController extends Controller
      * Search action from questions
      * @param Request $request
      * @return string
+     * 
      */
     public function search(Request $request)
     {
