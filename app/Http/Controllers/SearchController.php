@@ -24,23 +24,29 @@ class SearchController extends Controller
         $suggests = [];
         $error = '';
         $categories = $request->get('categories');
-        $keywords = $request->get('keywords');
-        if ($keywords) {
-            /* @var $query ClassName */
-            $query = (new Question())->query();
-            $query->where('question', 'like', '%' . $keywords . '%');
-            if (is_numeric($categories)) {
-                $query->where('category_id', $categories);
-            } elseif ($categories == 'none') {
-                $query->where(function ($query) {
-                    $query->whereNull('category_id');
-                    $query->orWhere('category_id', 0);
-                });
-            }
-            $suggests = $query->take(10)->get();
+        $stringKeywords = $request->get('keywords');
+        
+        $keywords = $this->explodeString($stringKeywords);
+        
+        if (!empty($keywords)) {
+          /* @var $query ClassName */
+          $query = (new Question())->query();
+          foreach($keywords as $keyword){
+            $query->where('question', 'like', '%' . $keyword . '%');
+          }
+          if (is_numeric($categories)) {
+              $query->where('category_id', $categories);
+          } elseif ($categories == 'none') {
+              $query->where(function ($query) {
+                  $query->whereNull('category_id');
+                  $query->orWhere('category_id', 0);
+              });
+          }
+          $suggests = $query->take(10)->get();
         } else {
             $error = 'Empty string';
         }
+        
         return response()
                         ->json(compact('suggests', 'error', 'categories'))
                         ->withCookie(
@@ -50,5 +56,15 @@ class SearchController extends Controller
                                 cookie('categories', $categories, 45000)
         );
     }
+
+    //*
+    //* Метод разбивает строку на слова
+    //*
+    private function explodeString($string)
+    {
+      $keywords = explode(" ", $string);
+      return $keywords;
+    }
+
 
 }
