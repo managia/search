@@ -24,25 +24,25 @@ class SearchController extends Controller
         $suggests = [];
         $error = '';
         $categories = $request->get('categories');
-        $stringKeywords = $request->get('keywords');
+        $keywords = $request->get('keywords');
         
-        $keywords = $this->explodeString($stringKeywords);
+        $keywordsExplode = $this->explodeString($keywords);
         
-        if (!empty($keywords)) {
-          /* @var $query ClassName */
-          $query = (new Question())->query();
-          foreach($keywords as $keyword){
-            $query->where('question', 'like', '%' . $keyword . '%');
-          }
-          if (is_numeric($categories)) {
+        if (!empty($keywordsExplode)) {
+            /* @var $query ClassName */
+            $query = (new Question())->query();
+            foreach($keywordsExplode as $keyword){
+              $query->where('question', 'like', '%' . $keyword . '%');
+            }
+            if (is_numeric($categories)) {
               $query->where('category_id', $categories);
-          } elseif ($categories == 'none') {
-              $query->where(function ($query) {
-                  $query->whereNull('category_id');
-                  $query->orWhere('category_id', 0);
-              });
-          }
-          $suggests = $query->take(10)->get();
+            } elseif ($categories == 'none') {
+                $query->where(function ($query) {
+                    $query->whereNull('category_id');
+                    $query->orWhere('category_id', 0);
+                });
+            }
+            $suggests = $query->take(10)->get();
         } else {
             $error = 'Empty string';
         }
@@ -62,8 +62,8 @@ class SearchController extends Controller
     //*
     private function explodeString($string)
     {
-      $keywords = explode(" ", $string);
-      return $keywords;
+        $keywords = explode(" ", $string);
+        return $keywords;
     }
 
 
