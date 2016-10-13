@@ -50,8 +50,9 @@ class SearchController extends Controller
                     $queryAnswer->orWhere('category_id', 0);
                 });
             }
-            $suggests = $queryQuestion->take(10)->get();
-            $suggestsTwo = $queryAnswer->take(10)->get();
+            $suggestsQuestion = $queryQuestion->take(10)->get();
+            $suggestsAnswer = $queryAnswer->take(10)->get();
+            $suggests = $suggestsQuestion->merge($suggestsAnswer);
         } else {
             $error = 'Empty string';
         }
