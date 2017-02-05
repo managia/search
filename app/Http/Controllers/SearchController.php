@@ -29,6 +29,8 @@ class SearchController extends Controller
         $keywordsExplode = $this->explodeString($keywords);
         
         if (!empty($keywordsExplode)) {
+            // Popular answers
+            $popularAnswer   = (new Question())->query()->where('popular', '=', 1);
             /* @var $queryQuestion ClassName */
             /* @var $queryAnswer   ClassName */
             $queryQuestion = (new Question())->query();
@@ -40,6 +42,7 @@ class SearchController extends Controller
             if (is_numeric($categories)) {
               $queryQuestion->where('category_id', $categories);
               $queryAnswer->where('category_id', $categories);
+              $popularAnswer->where('category_id', $categories);
             } elseif ($categories == 'none') {
                 $queryQuestion->where(function ($query) {
                     $queryQuestion->whereNull('category_id');
@@ -50,6 +53,7 @@ class SearchController extends Controller
                     $queryAnswer->orWhere('category_id', 0);
                 });
             }
+            $popular = $popularAnswer->take(7)->get();
             $suggestsQuestion = $queryQuestion->take(10)->get();
             $suggestsAnswer = $queryAnswer->take(10)->get();
             $suggests = $suggestsQuestion->merge($suggestsAnswer);
@@ -58,7 +62,7 @@ class SearchController extends Controller
         }
         
         return response()
-                        ->json(compact('suggests', 'error', 'categories'))
+                        ->json(compact('suggests', 'popular', 'error', 'categories'))
                         ->withCookie(
                                 cookie('keywords', $keywords, 45000)
                         )
