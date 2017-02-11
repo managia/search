@@ -10,13 +10,12 @@
                     Search page
                 </h1>
             </div>
-    <div class="row">
-        <div class="col-md-3" ng-controller="SearchController">
+    <div class="row" ng-controller="SearchController">
+        <div class="col-md-3">
             <h4>popular answers</h4>
-            <flash-message></flash-message>
             @include('popular')
         </div>
-        <div class="col-md-9" ng-controller="SearchController">
+        <div class="col-md-9">
             <flash-message></flash-message>
             <nav class="navbar navbar-default" role="navigation">
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
