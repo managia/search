@@ -21,6 +21,9 @@ class SearchController extends Controller
      */
     public function search(Request $request)
     {
+        $numQuestion = 10;
+        $numPopular = 7;
+        
         $suggests = [];
         $error = '';
         $categories = $request->get('categories');
@@ -52,10 +55,14 @@ class SearchController extends Controller
                     $queryAnswer->whereNull('category_id');
                     $queryAnswer->orWhere('category_id', 0);
                 });
+                $popularAnswer->where(function ($query) {
+                    $popularAnswer->whereNull('category_id');
+                    $popularAnswer->orWhere('category_id', 0);
+                });
             }
-            $popular = $popularAnswer->take(7)->get();
-            $suggestsQuestion = $queryQuestion->take(10)->get();
-            $suggestsAnswer = $queryAnswer->take(10)->get();
+            $popular = $popularAnswer->take($numPopular)->get();
+            $suggestsQuestion = $queryQuestion->take($numQuestion)->get();
+            $suggestsAnswer = $queryAnswer->take($numQuestion)->get();
             $suggests = $suggestsQuestion->merge($suggestsAnswer);
         } else {
             $error = 'Empty string';
