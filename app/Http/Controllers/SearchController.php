@@ -32,38 +32,30 @@ class SearchController extends Controller
         $keywordsExplode = $this->explodeString($keywords);
         
         if (!empty($keywordsExplode)) {
-            // Popular answers
+            /* @var $popularAnswer ClassName */
             $popularAnswer   = (new Question())->query()->where('popular', '=', 1);
             /* @var $queryQuestion ClassName */
-            /* @var $queryAnswer   ClassName */
             $queryQuestion = (new Question())->query();
             $queryAnswer   = (new Question())->query();
             foreach($keywordsExplode as $keyword){
-              $queryQuestion->where('question', 'like', '%' . $keyword . '%');
-              $queryAnswer->where('answer', 'like', '%' . $keyword . '%');
+                $queryQuestion->where('question', 'like', '%' . $keyword . '%')->orWhere('answer', 'like', '%' . $keyword . '%');
             }
             if (is_numeric($categories)) {
-              $queryQuestion->where('category_id', $categories);
-              $queryAnswer->where('category_id', $categories);
-              $popularAnswer->where('category_id', $categories);
+                $queryQuestion->where('category_id', $categories);
+                $popularAnswer->where('category_id', $categories);
             } elseif ($categories == 'none') {
                 $queryQuestion->where(function ($query) {
-                    $queryQuestion->whereNull('category_id');
-                    $queryQuestion->orWhere('category_id', 0);
-                });
-                $queryAnswer->where(function ($query) {
-                    $queryAnswer->whereNull('category_id');
-                    $queryAnswer->orWhere('category_id', 0);
+                    $query->whereNull('category_id');
+                    $query->orWhere('category_id', 0);
                 });
                 $popularAnswer->where(function ($query) {
-                    $popularAnswer->whereNull('category_id');
-                    $popularAnswer->orWhere('category_id', 0);
+                    $query->whereNull('category_id');
+                    $query->orWhere('category_id', 0);
                 });
             }
             $popular = $popularAnswer->take($numPopular)->get();
-            $suggestsQuestion = $queryQuestion->take($numQuestion)->get();
-            $suggestsAnswer = $queryAnswer->take($numQuestion)->get();
-            $suggests = $suggestsQuestion->merge($suggestsAnswer);
+            $suggests = $queryQuestion->take($numQuestion)->get();
+            
         } else {
             $error = 'Empty string';
         }

@@ -38,6 +38,16 @@
                                     }
                                     data.suggests[i].markedAnswer = marked;
                                 }
+                                for (i in data.popular) {
+                                    var marked = signMark(data.popular[i].answer),
+                                            mark = $(marked).has('mark');
+                                    if (mark.length) {
+                                        data.popular[i].mark = mark.text();
+                                    } else {
+                                        data.popular[i].mark = '';
+                                    }
+                                    data.popular[i].markedAnswer = marked;
+                                }
                                 $scope.data = data;
                                 $scope.result = data;
                             })
